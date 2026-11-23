@@ -1,0 +1,114 @@
+= Task JPMS
+
+> Fenrir ID: `jpms` +
+> Branch: `jpms` +
+> Points: `90`
+
+== Task submission
+
+Put all the files in the `jpms` directory:
+
+[,text,subs="+macros"]
+----
+icon:folder[] ...
+├─ icon:folder[] jpms
+│  ├─ icon:folder[] compilation
+│  ├─ icon:folder[] image
+│  ├─ icon:folder[] reflection
+│  └─ icon:folder[] services
+└─ icon:folder[] .git
+----
+
+IMPORTANT: All sources use java 25. The resulting bytecode must target java 25 too.
+
+== Compile modules (10 points)
+
+Subdirectory: `compilation`
+
+Update the sources so that they are assembled in a Java module `dt.jpms.bee`. The module must allow full reflective access to `CarpenterBee` and `MiningBee` and restricted access (only public & protected members) to `Bee`. `Bumblebee` and `Honeybee` must be inaccessible.
+
+Create a `build.sh` script which compiles the module and packages it into a `bee.jar` file. The file must be saved to the provided directory (`$1`).
+
+CAUTION: You must clean the build directory! Only `bee.jar` must be preserved at the provided directory (`$1`).
+
+
+== Reflection any way (10 points)
+
+Subdirectory: `reflection`
+
+Update the sources so that they are assembled in a Java module `dt.jpms.usage`. Add a `build.sh` script which compiles the module and assembles it into a `usage.jar` (_As in the previous task_). The sources use `lib/member.jar` module to get fields, using the Reflection API.
+
+Since JPMS restricts Reflection API abilities, you must find a way to bypass those restriction. Create a `run.sh` script which takes two arguments: the first one is either `n` or `m` and the second one is the directory, which has been given to the `build.sh` script.
+
+When running in `m` mode, you must run `Main` with JPMS restrictions on. When running in `n` mode, you must run `Main` bypassing any JPMS restrictions.
+
+CAUTION: You must clean the build directory!
+
+== Services (30 points)
+
+Subdirectory: `services`
+
+Now, you are to set up a multi-module project which uses `ServiceLoader` API.
+
+=== Modules
+
+dt.jpms.apiary.core::
+Core API. Key classes. Defines `Handler` class which must be implemented to create an entrypoint handler (_somehow like Spring's Controller_).
+
+dt.jpms.apiary.hive.south::
+Has a `South` implementation of `Handler`.
+
+dt.jpms.apiary.hive.north::
+Has a `North` implementation of `Handler`.
+
+dt.jpms.apiary::
+Entrypoint. Launches the server.
+
+=== What to do
+
+First of all, you must turn each directory in a proper Java module. The `jackson` dependencies are present in the `lib` directory.
+
+Create a `build.sh` script which assembles each module into a separate modular jar: `core.jar`, `apiary.jar`, `north.jar` and `south.jar`. The jars must be saved in the provided directory (`$1`). The `core.jar` must have an entrypoint.
+
+Go to the `Runner` class. Replace `// TODO: Load all Handlers here` with a code which loads all the provided handlers. To get the entrypoint use Reflection API: it is provided within an annotation.
+
+[,java]
+----
+import module dt.jpms.apiary.core;
+
+@Endpoint("/south")
+public class South extends Handler<InDTO, OutDTO> {
+    // ...
+}
+----
+
+CAUTION: You must clean the build directory!
+
+== Shrunk JRE (30 points)
+
+Subdirectory: `image`
+
+Use project jigsaw to create an archive which contains a shrunk JRE for the project. The name of the archive is passed as the first argument (`$1`) to the `build.sh` script. Add a `runner` launcher which runs the `Runner` class.
+
+NOTE: The resulting JRE image must be less than 30 MB!
+
+CAUTION: You must clean the build directory!
+
+== Questions
+* Why does `dt.jpms.bee` fail to compile without `module-info.java`?
+* How to bypass all JPMS restrictions?
+* How to get the module's name from a jar?
+* How does `ServiceLoader` work?
+* Why is it possible to reduce the JRE size?
+* What is the `launcher` in `jlink`? _Read its code_
+
+== Copyright
+
+pass:[<i class="fab fa-creative-commons"></i>]
+pass:[<i class="fab fa-creative-commons-by"></i>]
+pass:[<i class="fab fa-creative-commons-nc"></i>]
+pass:[<i class="fab fa-creative-commons-sa"></i>]
+
+The project is licensed under the terms of the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+(C) 2026-present *Iwan Kalinin* <mailto:koefic.cien@gmail.com[koefic.cien@gmail.com]>
