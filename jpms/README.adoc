@@ -21,7 +21,7 @@ icon:folder[] ...
 
 IMPORTANT: All sources use java 25. The resulting bytecode must target java 25 too.
 
-== Compile modules (10 points)
+== Compile modules (20 points)
 
 Subdirectory: `compilation`
 
